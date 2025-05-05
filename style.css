@@ -1,0 +1,970 @@
+:root {
+    --board-size: 9;
+    --cell-size: min(8.5vw, 38px); /* Slightly larger, adjust as needed */
+    --gap-size: 2px;
+    --board-bg: #151b3a; /* Más oscuro como en la referencia */
+    --cell-bg: #2a2a4e;
+    --empty-cell-bg: #1f2549; /* Más cercano a la referencia */
+    --container-bg: #3a4895; /* Fondo azul similar a la imagen de referencia */
+    --text-color: #ffffff;
+    --score-color: #ffe68a; /* Más dorado */
+    --button-bg: #4a4a7f;
+    --button-hover-bg: #6a6aaf;
+    --combo-color: #ff924c; /* Orange for combos */
+
+    /* Vibrant Piece Colors (inspired by reference) */
+    --color-1: #ff595e; /* Rojo */
+    --color-2: #ffd166; /* Amarillo - ajustado para la referencia */
+    --color-3: #54c059; /* Verde - ajustado para la referencia */
+    --color-4: #2d8fff; /* Azul - ajustado para la referencia */
+    --color-5: #bf83fb; /* Púrpura - ajustado para la referencia */
+    --color-6: #ff924c; /* Naranja */
+    --color-7: #5fc9f8; /* Azul claro */
+
+    /* UI Enhancements */
+    --header-bg: rgba(26, 26, 46, 0.8); /* Semi-transparent header */
+    --cell-border-radius: 5px;
+    --piece-border-radius: 5px;
+    --button-border-radius: 6px;
+    
+    /* Efectos 3D */
+    --cell-highlight: rgba(255, 255, 255, 0.4);
+    --cell-shadow: rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+}
+
+html, body {
+    height: 100%;
+    background: linear-gradient(135deg, #3a4895, #2c377a); /* Fondo azul similar a la referencia */
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    max-width: 500px;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    position: relative;
+}
+
+/* Decoración de fondo */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.15));
+    z-index: -1;
+    pointer-events: none;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Match board width dynamically */
+    width: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: rgba(25, 31, 63, 0.8); /* Más oscuro y semi-transparente */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto corona similar a la imagen de referencia */
+.score-container::before {
+    content: '👑';
+    font-size: 1.2em;
+    margin-right: 8px;
+    filter: drop-shadow(0 0 2px gold);
+}
+
+.score-container {
+    color: var(--text-color);
+    font-size: 1.6em;
+    font-weight: bold;
+    display: flex; /* Align items */
+    align-items: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+#score {
+    color: var(--score-color);
+    margin-left: 10px;
+    font-size: 1.2em;
+    min-width: 60px;
+    text-align: right;
+    transition: transform 0.2s ease-out, color 0.2s ease;
+    display: inline-block;
+}
+
+#score.updated {
+    transform: scale(1.3);
+    color: #ffffff;
+    animation: score-pulse 0.4s ease-out;
+}
+
+@keyframes score-pulse {
+    0% { text-shadow: 0 0 5px rgba(255, 230, 138, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(255, 230, 138, 1); }
+    100% { text-shadow: 0 0 5px rgba(255, 230, 138, 0.5); }
+}
+
+/* Combo display (add this element in HTML if needed, or manage via JS) */
+.combo-display {
+    color: var(--combo-color);
+    font-size: 0.9em;
+    margin-left: 15px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: scale(0.8);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.combo-display.visible {
+    opacity: 1;
+    transform: scale(1);
+    animation: combo-bounce 0.5s ease-out;
+}
+
+@keyframes combo-bounce {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.restart-button {
+    background: linear-gradient(145deg, #5a5aa0, #464680);
+    border: none;
+    color: var(--text-color);
+    padding: 10px 12px;
+    border-radius: var(--button-border-radius);
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 1;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.restart-button:hover {
+    background: linear-gradient(145deg, #6a6ab0, #5a5a90);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.restart-button:active {
+    transform: scale(0.95) translateY(0);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.game-board-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Efecto de brillo alrededor del tablero */
+.game-board-container::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 10px;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(80, 120, 255, 0.15) 0%,
+        rgba(0, 0, 0, 0) 70%
+    );
+    z-index: -1;
+    pointer-events: none;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(var(--board-size), var(--cell-size));
+    grid-template-rows: repeat(var(--board-size), var(--cell-size));
+    gap: var(--gap-size);
+    background-color: var(--board-bg);
+    padding: 4px;
+    border: 3px solid rgba(30, 38, 70, 0.9); /* Borde más pronunciado */
+    border-radius: 8px;
+    width: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
+    height: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.5),
+        0 5px 15px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de cuadrícula en el tablero */
+.game-board::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: calc(var(--cell-size) + var(--gap-size)) calc(var(--cell-size) + var(--gap-size));
+    pointer-events: none;
+}
+
+.cell {
+    background-color: var(--empty-cell-bg);
+    border-radius: var(--cell-border-radius);
+    transition: background-color 0.1s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.cell.occupied {
+    /* Efecto 3D para las celdas ocupadas - más parecido a la referencia */
+    box-shadow: 
+        inset 2px 2px 3px var(--cell-highlight),
+        inset -2px -2px 3px var(--cell-shadow);
+    transform: scale(1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Efecto brillante 3D para las celdas ocupadas */
+.cell.occupied::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 100%);
+    border-radius: inherit;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Animación para colocar una pieza */
+@keyframes place-piece {
+    0% { transform: scale(0.7); opacity: 0.7; filter: brightness(1.5); }
+    40% { transform: scale(1.15); opacity: 1; filter: brightness(1.2); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+.cell.placed {
+    animation: place-piece 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
+}
+
+.piece-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    width: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
+    margin-top: auto;
+    min-height: calc(var(--cell-size) * 4.5 + 3 * var(--gap-size) + 20px);
+    padding: 15px 0;
+    background-color: rgba(25, 31, 63, 0.7); /* Fondo similar al header pero más transparente */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* Efecto de brillo en el contenedor de piezas */
+.piece-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0) 100%);
+    z-index: 1;
+}
+
+.piece {
+    display: grid;
+    gap: var(--gap-size);
+    cursor: grab;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    will-change: transform, opacity;
+    animation: appear 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    opacity: 0;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+    position: relative;
+}
+
+@keyframes appear {
+    from { transform: translateY(30px) scale(0.6); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Animación escalonada para piezas */
+.piece:nth-child(1) { animation-delay: 0s; }
+.piece:nth-child(2) { animation-delay: 0.1s; }
+.piece:nth-child(3) { animation-delay: 0.2s; }
+
+/* Pulsación suave de las piezas para llamar la atención */
+@keyframes piece-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.piece:hover {
+    animation: piece-pulse 1.5s ease-in-out infinite;
+}
+
+.piece:active {
+    cursor: grabbing;
+    animation: none;
+}
+
+.piece-cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--cell-bg);
+    border-radius: var(--piece-border-radius);
+    /* Efecto 3D para las piezas - más parecido a la referencia */
+    box-shadow: 
+        inset 2px 2px 3px var(--cell-highlight),
+        inset -2px -2px 3px var(--cell-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto brillante 3D para las celdas de pieza */
+.piece-cell:not(.empty)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 100%);
+    border-radius: inherit;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.piece-cell.empty {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+/* Estilos para arrastrar */
+.piece.dragging {
+    opacity: 0.4 !important;
+    transform: scale(1.1);
+    animation: none;
+    z-index: 1000;
+}
+
+/* Destacar zona de colocación potencial */
+.cell.drag-over {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    transform: scale(1.05);
+    box-shadow: 
+        inset 0 0 5px rgba(255, 255, 255, 0.5),
+        0 0 8px rgba(100, 200, 255, 0.5);
+    z-index: 5;
+}
+
+/* Destacar colocación inválida */
+.cell.invalid-placement {
+    background-color: rgba(255, 60, 60, 0.4) !important;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+}
+
+/* Animación para limpiar líneas */
+@keyframes clear-line {
+    0% { 
+        transform: scale(1); 
+        opacity: 1; 
+        background-color: rgba(255, 255, 120, 0.9); 
+        border-radius: var(--cell-border-radius);
+        box-shadow: 0 0 20px rgba(255, 255, 100, 0.8), inset 0 0 10px rgba(255, 255, 100, 0.5);
+    }
+    30% { 
+        transform: scale(1.1); 
+        opacity: 0.9; 
+        background-color: rgba(255, 255, 200, 1);
+    }
+    100% { 
+        transform: scale(0.1); 
+        opacity: 0; 
+        background-color: var(--empty-cell-bg); 
+        border-radius: 50%; 
+        box-shadow: 0 0 40px rgba(255, 255, 100, 0);
+    }
+}
+
+.cell.clearing {
+    animation: clear-line 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    background-color: var(--empty-cell-bg) !important;
+    box-shadow: none !important;
+    z-index: 10;
+}
+
+/* Pantalla de fin de juego */
+.game-over-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(30, 38, 70, 0.9), rgba(15, 15, 27, 0.95));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 100;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    backdrop-filter: blur(5px);
+}
+
+.game-over-screen:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.game-over-screen h2 {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    color: var(--color-1);
+    text-shadow: 0 0 15px rgba(255,100,100,0.7), 0 2px 5px rgba(0,0,0,0.7);
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: gameOverSlideIn 0.6s 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.game-over-screen p {
+    font-size: 2em;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transform: translateY(-20px);
+    opacity: 0;
+    animation: gameOverSlideIn 0.6s 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+#play-again-button {
+    padding: 18px 40px;
+    font-size: 1.5em;
+    cursor: pointer;
+    background: linear-gradient(145deg, var(--color-3), #4d8819);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+    animation: gameOverSlideIn 0.6s 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    position: relative;
+    overflow: hidden;
+}
+
+#play-again-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0));
+    border-radius: 12px 12px 0 0;
+}
+
+#play-again-button:hover {
+    background: linear-gradient(145deg, #75d03e, #5aa826);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+}
+
+#play-again-button:active {
+    transform: scale(0.95) translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes gameOverSlideIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Colores específicos para las piezas */
+.color-1 { 
+    background: linear-gradient(135deg, #ff8085, #ff595e);
+}
+.color-2 { 
+    background: linear-gradient(135deg, #ffe08a, #ffd166);
+}
+.color-3 { 
+    background: linear-gradient(135deg, #70e076, #54c059);
+}
+.color-4 { 
+    background: linear-gradient(135deg, #50a8ff, #2d8fff);
+}
+.color-5 { 
+    background: linear-gradient(135deg, #cf9ffc, #bf83fb);
+}
+.color-6 { 
+    background: linear-gradient(135deg, #ffad71, #ff924c);
+}
+.color-7 { 
+    background: linear-gradient(135deg, #8ad7fc, #5fc9f8);
+}
+
+/* Brillo de especial para líneas completas */
+@keyframes line-glow {
+    0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+    50% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+}
+
+/* Efecto de partículas para cuando se coloca una pieza (CSS puro) */
+@keyframes particle-fade {
+    0% { opacity: 0.8; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+}
+
+/* Animación para puntos flotantes */
+@keyframes float-up {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-30px) scale(1.2); opacity: 0; }
+}
+
+/* Efecto flash en el tablero */
+.board-flash {
+    animation: board-flash 0.1s ease-out;
+}
+
+@keyframes board-flash {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+    100% { filter: brightness(1); }
+}
+
+/* Efecto sacudida del tablero */
+.board-shake {
+    animation: board-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes board-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* Combo grande con efecto pulsante */
+.mega-combo {
+    color: #ff924c !important;
+    text-shadow: 0 0 10px rgba(255, 146, 76, 0.8) !important;
+    animation: mega-combo-pulse 0.8s infinite alternate !important;
+    font-size: 1.1em !important;
+}
+
+@keyframes mega-combo-pulse {
+    0% { text-shadow: 0 0 10px rgba(255, 146, 76, 0.8); transform: scale(1); }
+    100% { text-shadow: 0 0 15px rgba(255, 146, 76, 1), 0 0 20px rgba(255, 255, 100, 0.8); transform: scale(1.1); }
+}
+
+/* Contenedor para el texto de feedback */
+#feedback-text-container {
+    position: absolute;
+    top: 40%; /* Un poco más centrado */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    height: 120px; /* Altura suficiente para el texto más grande */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* No interferir con clics */
+    z-index: 200; /* Por encima de todo */
+    overflow: visible; /* Permitir que el brillo se extienda fuera del contenedor */
+}
+
+#feedback-text {
+    font-size: 3em; /* Tamaño base */
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: scale(0.1);
+    position: absolute;
+    white-space: nowrap; /* Evitar saltos de línea */
+    will-change: transform, opacity; /* Optimización de rendimiento */
+}
+
+/* Animación base mejorada para el texto */
+.show-feedback {
+    animation: feedback-animation 1.5s cubic-bezier(0.17, 0.67, 0.24, 0.94) forwards;
+}
+
+@keyframes feedback-animation {
+    0% { transform: scale(0.01) translateX(0); opacity: 0; }
+    10% { transform: scale(0.5) translateX(0); opacity: 0.5; }
+    25% { transform: scale(1.4) translateX(0); opacity: 1; }
+    35% { transform: scale(1) translateX(0); opacity: 1; }
+    75% { transform: scale(1) translateX(0); opacity: 1; }
+    100% { transform: scale(1) translateX(200%); opacity: 0; }
+}
+
+/* Animación especial mejorada para "Unbelievable!" */
+.show-unbelievable {
+    animation: 
+        feedback-animation-unbelievable 1.8s cubic-bezier(0.17, 0.67, 0.24, 0.94) forwards,
+        rainbow-text 0.8s linear infinite,
+        unbelievable-glow 0.7s ease-in-out infinite alternate;
+    background-image: linear-gradient(
+        90deg, 
+        #ff0000, #ff9900, #ffff00, #33cc33, #3399ff, #6633cc, #ff33cc, #ff0000
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent; /* Ocultar color base para mostrar gradiente */
+    font-size: 4em; /* Más grande que el normal */
+    font-weight: 800;
+    letter-spacing: 1px;
+    z-index: 201; /* Asegurar que esté por encima */
+}
+
+/* Animación específica para Unbelievable con un efecto de aparición más dramático */
+@keyframes feedback-animation-unbelievable {
+    0% { transform: scale(0.01) translateX(0) rotate(-5deg); opacity: 0; filter: blur(10px); }
+    15% { transform: scale(0.7) translateX(0) rotate(3deg); opacity: 0.7; filter: blur(2px); }
+    25% { transform: scale(1.5) translateX(0) rotate(-2deg); opacity: 1; filter: blur(0); }
+    35% { transform: scale(1.1) translateX(0) rotate(0); opacity: 1; }
+    75% { transform: scale(1.1) translateX(0); opacity: 1; }
+    100% { transform: scale(1.1) translateX(200%); opacity: 0; }
+}
+
+/* Efecto arcoíris más rápido y dinámico */
+@keyframes rainbow-text {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Resplandor mejorado que afecta al área circundante */
+@keyframes unbelievable-glow {
+    0% {
+        filter: 
+            drop-shadow(0 0 5px rgba(255, 255, 255, 0.8))
+            drop-shadow(0 0 10px rgba(255, 100, 100, 0.5));
+        text-shadow: 
+            0 0 5px rgba(255, 255, 255, 0.8),
+            0 0 15px rgba(255, 0, 0, 0.4),
+            0 0 20px rgba(255, 255, 0, 0.2);
+    }
+    100% {
+        filter: 
+            drop-shadow(0 0 15px rgba(255, 255, 255, 0.9))
+            drop-shadow(0 0 25px rgba(100, 200, 255, 0.8));
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.9),
+            0 0 20px rgba(0, 200, 255, 0.6),
+            0 0 30px rgba(200, 100, 255, 0.4),
+            0 0 40px rgba(255, 200, 0, 0.3);
+    }
+}
+
+/* Añadir un resplandor de fondo para el efecto Unbelievable */
+.show-unbelievable::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 160%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 200, 100, 0.15) 30%,
+        rgba(100, 200, 255, 0.1) 60%,
+        rgba(0, 0, 0, 0) 70%
+    );
+    z-index: -1;
+    border-radius: 50%;
+    opacity: 0;
+    animation: bg-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes bg-pulse {
+    0% { opacity: 0.4; transform: translate(-50%, -50%) scale(0.9); }
+    100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* --- Estilos para la pantalla de Login --- */
+#login-screen {
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    background-color: rgba(25, 31, 63, 0.85); /* Similar a otros contenedores */
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: absolute; /* O relative si body es el contenedor flex */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#login-screen h1 {
+    font-size: 2.8em;
+    color: var(--text-color);
+    margin-bottom: 5px;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.author-text {
+    font-size: 0.9em;
+    color: #b0c4de; /* Grisáceo claro */
+    margin-bottom: 25px;
+}
+
+#auth-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-container h3 {
+    font-size: 1.2em;
+    color: var(--score-color);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+#login-screen input[type="email"],
+#login-screen input[type="password"] {
+    padding: 12px 15px;
+    border: 1px solid var(--button-bg);
+    border-radius: var(--button-border-radius);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+#login-screen input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#login-screen input:focus {
+    border-color: var(--score-color);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+#login-screen button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: var(--button-border-radius);
+    background: var(--button-bg);
+    color: var(--text-color);
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    flex-grow: 1; /* Para que ocupen el espacio */
+}
+
+#login-screen button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+#login-screen button:active {
+    transform: scale(0.97);
+}
+
+#login-screen #signup-button {
+    background: linear-gradient(145deg, var(--color-3), #4d8819);
+}
+#login-screen #signup-button:hover {
+     background: linear-gradient(145deg, #75d03e, #5aa826);
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 5px 0;
+}
+
+.separator::before, .separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.separator span {
+    padding: 0 10px;
+    font-size: 0.9em;
+}
+
+#google-signin-button {
+    background-color: #ffffff;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#google-signin-button:hover {
+    background-color: #f5f5f5;
+}
+
+#google-signin-button img {
+    margin-top: -2px; /* Ajuste visual */
+}
+
+.error-message {
+    color: #ff6b6b; /* Rojo claro para errores */
+    font-size: 0.9em;
+    min-height: 1.2em; /* Para evitar saltos */
+    margin-top: 5px;
+}
+
+#loading-indicator {
+    margin-top: 15px;
+    color: var(--score-color);
+}
+
+/* --- Clases de Visibilidad --- */
+.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Evitar interacciones cuando está oculto */
+}
+
+/* Mostrar el juego cuando el usuario está logueado */
+#game-wrapper:not(.hidden) {
+    display: flex; /* O el display original que tenía game-container */
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+/* Botón de Logout */
+.logout-button {
+    background: linear-gradient(145deg, #884444, #663333); /* Tono rojizo */
+    border: none;
+    color: var(--text-color);
+    padding: 10px 12px;
+    border-radius: var(--button-border-radius);
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 1;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    margin-left: 10px; /* Espacio respecto al restart */
+}
+
+.logout-button:hover {
+    background: linear-gradient(145deg, #a85555, #804444);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.logout-button:active {
+    transform: scale(0.95) translateY(0);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+/* Ajuste para el contenedor principal cuando se muestra */
+body.game-active {
+    /* Podrías necesitar ajustar el fondo o alineación si cambia al mostrar el juego */
+}
+
+/* --- Fin Estilos Login --- */
+
+/* Ajustar el contenedor del juego para que use el wrapper */
+#game-wrapper .game-container {
+    /* Hereda estilos o define los específicos si es necesario */
+    max-width: 500px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    position: relative; /* Necesario para elementos absolutos internos */
+}
+
+/* ... resto de estilos existentes ... */
+
+/* Asegurarse de que game-container no tenga tamaño inicial cuando está oculto */
+#game-wrapper.hidden .game-container {
+    width: 0;
+    height: 0;
+    overflow: hidden;
+} 
