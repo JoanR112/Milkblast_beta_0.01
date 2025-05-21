@@ -1,33 +1,33 @@
 :root {
     --board-size: 9;
-    --cell-size: min(8.5vw, 38px); /* Slightly larger, adjust as needed */
+    --cell-size: min(8.5vw, 38px); 
     --gap-size: 2px;
-    --board-bg: #151b3a; /* Más oscuro como en la referencia */
+    --board-bg: #151b3a; 
     --cell-bg: #2a2a4e;
-    --empty-cell-bg: #1f2549; /* Más cercano a la referencia */
-    --container-bg: #3a4895; /* Fondo azul similar a la imagen de referencia */
+    --empty-cell-bg: #1f2549; 
+    --container-bg: #3a4895; 
     --text-color: #ffffff;
-    --score-color: #ffe68a; /* Más dorado */
+    --score-color: #ffe68a; 
     --button-bg: #4a4a7f;
     --button-hover-bg: #6a6aaf;
-    --combo-color: #ff924c; /* Orange for combos */
+    --combo-color: #ff924c; 
 
-    /* Vibrant Piece Colors (inspired by reference) */
-    --color-1: #ff595e; /* Rojo */
-    --color-2: #ffd166; /* Amarillo - ajustado para la referencia */
-    --color-3: #54c059; /* Verde - ajustado para la referencia */
-    --color-4: #2d8fff; /* Azul - ajustado para la referencia */
-    --color-5: #bf83fb; /* Púrpura - ajustado para la referencia */
-    --color-6: #ff924c; /* Naranja */
-    --color-7: #5fc9f8; /* Azul claro */
+    
+    --color-1: #ff595e; 
+    --color-2: #ffd166; 
+    --color-3: #54c059; 
+    --color-4: #2d8fff; 
+    --color-5: #bf83fb; 
+    --color-6: #ff924c; 
+    --color-7: #5fc9f8; 
 
-    /* UI Enhancements */
-    --header-bg: rgba(26, 26, 46, 0.8); /* Semi-transparent header */
+    
+    --header-bg: rgba(26, 26, 46, 0.8); 
     --cell-border-radius: 5px;
     --piece-border-radius: 5px;
     --button-border-radius: 6px;
     
-    /* Efectos 3D */
+    
     --cell-highlight: rgba(255, 255, 255, 0.4);
     --cell-shadow: rgba(0, 0, 0, 0.5);
 }
@@ -36,12 +36,12 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html, body {
     height: 100%;
-    background: linear-gradient(135deg, #3a4895, #2c377a); /* Fondo azul similar a la referencia */
+    background: linear-gradient(135deg, #3a4895, #2c377a); 
     color: var(--text-color);
     display: flex;
     justify-content: center;
@@ -65,7 +65,7 @@ html, body {
     position: relative;
 }
 
-/* Decoración de fondo */
+
 .game-container::before {
     content: '';
     position: absolute;
@@ -82,20 +82,19 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* Match board width dynamically */
     width: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
     margin-bottom: 15px;
     padding: 15px;
-    background-color: rgba(25, 31, 63, 0.8); /* Más oscuro y semi-transparente */
+    background-color: rgba(25, 31, 63, 0.8); 
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     position: relative;
     overflow: hidden;
 }
 
-/* Efecto corona similar a la imagen de referencia */
+
 .score-container::before {
-    content: '👑';
+    content: 💫'';
     font-size: 1.2em;
     margin-right: 8px;
     filter: drop-shadow(0 0 2px gold);
@@ -105,7 +104,7 @@ html, body {
     color: var(--text-color);
     font-size: 1.6em;
     font-weight: bold;
-    display: flex; /* Align items */
+    display: flex;
     align-items: center;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
@@ -132,7 +131,7 @@ html, body {
     100% { text-shadow: 0 0 5px rgba(255, 230, 138, 0.5); }
 }
 
-/* Combo display (add this element in HTML if needed, or manage via JS) */
+
 .combo-display {
     color: var(--combo-color);
     font-size: 0.9em;
@@ -190,7 +189,7 @@ html, body {
     position: relative;
 }
 
-/* Efecto de brillo alrededor del tablero */
+
 .game-board-container::after {
     content: '';
     position: absolute;
@@ -215,7 +214,7 @@ html, body {
     gap: var(--gap-size);
     background-color: var(--board-bg);
     padding: 4px;
-    border: 3px solid rgba(30, 38, 70, 0.9); /* Borde más pronunciado */
+    border: 3px solid rgba(30, 38, 70, 0.9); 
     border-radius: 8px;
     width: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
     height: calc(var(--board-size) * var(--cell-size) + var(--board-size) * var(--gap-size));
@@ -226,7 +225,7 @@ html, body {
     overflow: hidden;
 }
 
-/* Efecto de cuadrícula en el tablero */
+
 .game-board::before {
     content: '';
     position: absolute;
@@ -249,7 +248,6 @@ html, body {
 }
 
 .cell.occupied {
-    /* Efecto 3D para las celdas ocupadas - más parecido a la referencia */
     box-shadow: 
         inset 2px 2px 3px var(--cell-highlight),
         inset -2px -2px 3px var(--cell-shadow);
@@ -258,7 +256,6 @@ html, body {
     z-index: 1;
 }
 
-/* Efecto brillante 3D para las celdas ocupadas */
 .cell.occupied::before {
     content: '';
     position: absolute;
@@ -272,7 +269,7 @@ html, body {
     pointer-events: none;
 }
 
-/* Animación para colocar una pieza */
+
 @keyframes place-piece {
     0% { transform: scale(0.7); opacity: 0.7; filter: brightness(1.5); }
     40% { transform: scale(1.15); opacity: 1; filter: brightness(1.2); }
@@ -292,13 +289,13 @@ html, body {
     margin-top: auto;
     min-height: calc(var(--cell-size) * 4.5 + 3 * var(--gap-size) + 20px);
     padding: 15px 0;
-    background-color: rgba(25, 31, 63, 0.7); /* Fondo similar al header pero más transparente */
+    background-color: rgba(25, 31, 63, 0.7);
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     position: relative;
 }
 
-/* Efecto de brillo en el contenedor de piezas */
+
 .piece-container::before {
     content: '';
     position: absolute;
@@ -330,12 +327,12 @@ html, body {
     to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* Animación escalonada para piezas */
+
 .piece:nth-child(1) { animation-delay: 0s; }
 .piece:nth-child(2) { animation-delay: 0.1s; }
 .piece:nth-child(3) { animation-delay: 0.2s; }
 
-/* Pulsación suave de las piezas para llamar la atención */
+
 @keyframes piece-pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.02); }
@@ -356,7 +353,7 @@ html, body {
     height: var(--cell-size);
     background-color: var(--cell-bg);
     border-radius: var(--piece-border-radius);
-    /* Efecto 3D para las piezas - más parecido a la referencia */
+   
     box-shadow: 
         inset 2px 2px 3px var(--cell-highlight),
         inset -2px -2px 3px var(--cell-shadow);
@@ -364,7 +361,7 @@ html, body {
     overflow: hidden;
 }
 
-/* Efecto brillante 3D para las celdas de pieza */
+
 .piece-cell:not(.empty)::before {
     content: '';
     position: absolute;
@@ -383,7 +380,7 @@ html, body {
     box-shadow: none;
 }
 
-/* Estilos para arrastrar */
+
 .piece.dragging {
     opacity: 0.4 !important;
     transform: scale(1.1);
@@ -391,7 +388,7 @@ html, body {
     z-index: 1000;
 }
 
-/* Destacar zona de colocación potencial */
+
 .cell.drag-over {
     background-color: rgba(255, 255, 255, 0.25) !important;
     transform: scale(1.05);
@@ -401,13 +398,13 @@ html, body {
     z-index: 5;
 }
 
-/* Destacar colocación inválida */
+
 .cell.invalid-placement {
     background-color: rgba(255, 60, 60, 0.4) !important;
     box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
 }
 
-/* Animación para limpiar líneas */
+
 @keyframes clear-line {
     0% { 
         transform: scale(1); 
@@ -437,7 +434,7 @@ html, body {
     z-index: 10;
 }
 
-/* Pantalla de fin de juego */
+
 .game-over-screen {
     position: absolute;
     top: 0;
@@ -530,7 +527,7 @@ html, body {
     }
 }
 
-/* Colores específicos para las piezas */
+
 .color-1 { 
     background: linear-gradient(135deg, #ff8085, #ff595e);
 }
@@ -553,26 +550,26 @@ html, body {
     background: linear-gradient(135deg, #8ad7fc, #5fc9f8);
 }
 
-/* Brillo de especial para líneas completas */
+
 @keyframes line-glow {
     0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
     50% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
     100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
 }
 
-/* Efecto de partículas para cuando se coloca una pieza (CSS puro) */
+
 @keyframes particle-fade {
     0% { opacity: 0.8; transform: translate(0, 0) scale(1); }
     100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
 }
 
-/* Animación para puntos flotantes */
+
 @keyframes float-up {
     0% { transform: translateY(0) scale(1); opacity: 1; }
     100% { transform: translateY(-30px) scale(1.2); opacity: 0; }
 }
 
-/* Efecto flash en el tablero */
+
 .board-flash {
     animation: board-flash 0.1s ease-out;
 }
@@ -583,7 +580,7 @@ html, body {
     100% { filter: brightness(1); }
 }
 
-/* Efecto sacudida del tablero */
+
 .board-shake {
     animation: board-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
@@ -594,7 +591,7 @@ html, body {
     20%, 40%, 60%, 80% { transform: translateX(2px); }
 }
 
-/* Combo grande con efecto pulsante */
+
 .mega-combo {
     color: #ff924c !important;
     text-shadow: 0 0 10px rgba(255, 146, 76, 0.8) !important;
@@ -607,25 +604,25 @@ html, body {
     100% { text-shadow: 0 0 15px rgba(255, 146, 76, 1), 0 0 20px rgba(255, 255, 100, 0.8); transform: scale(1.1); }
 }
 
-/* Contenedor para el texto de feedback */
+
 #feedback-text-container {
     position: absolute;
-    top: 40%; /* Un poco más centrado */
+    top: 40%; 
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
     max-width: 500px;
-    height: 120px; /* Altura suficiente para el texto más grande */
+    height: 120px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: none; /* No interferir con clics */
-    z-index: 200; /* Por encima de todo */
-    overflow: visible; /* Permitir que el brillo se extienda fuera del contenedor */
+    pointer-events: none; 
+    z-index: 200; 
+    overflow: visible; 
 }
 
 #feedback-text {
-    font-size: 3em; /* Tamaño base */
+    font-size: 3em; 
     font-weight: bold;
     color: white;
     text-align: center;
@@ -633,11 +630,11 @@ html, body {
     opacity: 0;
     transform: scale(0.1);
     position: absolute;
-    white-space: nowrap; /* Evitar saltos de línea */
-    will-change: transform, opacity; /* Optimización de rendimiento */
+    white-space: nowrap; 
+    will-change: transform, opacity; 
 }
 
-/* Animación base mejorada para el texto */
+
 .show-feedback {
     animation: feedback-animation 1.5s cubic-bezier(0.17, 0.67, 0.24, 0.94) forwards;
 }
@@ -651,7 +648,7 @@ html, body {
     100% { transform: scale(1) translateX(200%); opacity: 0; }
 }
 
-/* Animación especial mejorada para "Unbelievable!" */
+
 .show-unbelievable {
     animation: 
         feedback-animation-unbelievable 1.8s cubic-bezier(0.17, 0.67, 0.24, 0.94) forwards,
@@ -664,14 +661,14 @@ html, body {
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent; /* Ocultar color base para mostrar gradiente */
-    font-size: 4em; /* Más grande que el normal */
+    color: transparent; 
+    font-size: 4em; 
     font-weight: 800;
     letter-spacing: 1px;
-    z-index: 201; /* Asegurar que esté por encima */
+    z-index: 201; 
 }
 
-/* Animación específica para Unbelievable con un efecto de aparición más dramático */
+
 @keyframes feedback-animation-unbelievable {
     0% { transform: scale(0.01) translateX(0) rotate(-5deg); opacity: 0; filter: blur(10px); }
     15% { transform: scale(0.7) translateX(0) rotate(3deg); opacity: 0.7; filter: blur(2px); }
@@ -681,14 +678,14 @@ html, body {
     100% { transform: scale(1.1) translateX(200%); opacity: 0; }
 }
 
-/* Efecto arcoíris más rápido y dinámico */
+
 @keyframes rainbow-text {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* Resplandor mejorado que afecta al área circundante */
+
 @keyframes unbelievable-glow {
     0% {
         filter: 
@@ -711,7 +708,7 @@ html, body {
     }
 }
 
-/* Añadir un resplandor de fondo para el efecto Unbelievable */
+
 .show-unbelievable::before {
     content: '';
     position: absolute;
@@ -738,7 +735,7 @@ html, body {
     100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 600px) {
-    /* ... (resto de ajustes para dispositivos más pequeños) ... */
+
 } 
