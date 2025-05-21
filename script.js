@@ -24,8 +24,8 @@ let draggedPiece = null;
 let isGameOver = false;
 let comboMultiplier = 0;
 let consecutiveClears = 0;
-let highlightedCells = []; // Para resaltar las piezas
-let touchStartRelative = { row: 0, col: 0 }; // para la mecanica de tocar
+let highlightedCells = []; 
+let touchStartRelative = { row: 0, col: 0 }; 
 
 
 const audioFiles = {
