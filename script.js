@@ -1,9 +1,9 @@
-// Game constants and variables
+
 const BOARD_SIZE = 9;
 const PIECE_AREA_COUNT = 3;
 const PARTICLES_ENABLED = true;
 
-// DOM Elements
+
 let gameBoardElement;
 let pieceContainerElement;
 let scoreElement;
@@ -14,9 +14,9 @@ let restartButtonElement;
 let playAgainButtonElement;
 let feedbackTextElement;
 let particleContainer = null;
-let cellElementsCache = []; // Cache for board cell DOM elements
+let cellElementsCache = []; 
 
-// Game State
+
 let board = [];
 let score = 0;
 let currentPieces = [];
@@ -24,59 +24,59 @@ let draggedPiece = null;
 let isGameOver = false;
 let comboMultiplier = 0;
 let consecutiveClears = 0;
-let highlightedCells = []; // For drag highlight
-let touchStartRelative = { row: 0, col: 0 }; // For touch
+let highlightedCells = []; // Para resaltar las piezas
+let touchStartRelative = { row: 0, col: 0 }; // para la mecanica de tocar
 
-// Audios
+
 const audioFiles = {
-    background: 'Blockbuster Beat.mp3', // Add background music
+    background: 'Blockbuster Beat.mp3', 
     good: 'good.mp3',
     great: 'great.mp3',
     fantastic: 'fantastic.mp3',
     excellent: 'excellent.mp3',
     unbelievable: 'unbelievable.mp3',
-    chiu: 'chiu.mp3', // Add the new combo sound
-    gameover: 'losing-horn-313723.mp3' // Add the game over sound
+    chiu: 'chiu.mp3', 
+    gameover: 'losing-horn-313723.mp3' 
 };
 let sounds = {};
-let backgroundMusic = null; // Variable to hold the background music audio object
+let backgroundMusic = null; 
 
-// Piece Definitions
+// What a borring coding session today!!!!!!
 const PIECES = [
-    // Single Block (1x1)
+    
     { shape: [[1]], colorClass: 'color-1', points: 1 },
-    // Domino (1x2)
+
     { shape: [[1, 1]], colorClass: 'color-2', points: 2 },
-    // Domino Vertical (2x1)
+   
     { shape: [[1], [1]], colorClass: 'color-2', points: 2 },
-    // Trio (1x3)
+
     { shape: [[1, 1, 1]], colorClass: 'color-3', points: 3 },
-    // Trio Vertical (3x1)
+    
     { shape: [[1], [1], [1]], colorClass: 'color-3', points: 3 },
-    // Square (2x2)
+   
     { shape: [[1, 1], [1, 1]], colorClass: 'color-4', points: 4 },
-    // L-Shape (Multiple variations for variety)
+
     { shape: [[1, 0], [1, 0], [1, 1]], colorClass: 'color-5', points: 5 },
     { shape: [[0, 1], [0, 1], [1, 1]], colorClass: 'color-5', points: 5 },
     { shape: [[1, 1, 1], [1, 0, 0]], colorClass: 'color-5', points: 5 },
     { shape: [[1, 1, 1], [0, 0, 1]], colorClass: 'color-5', points: 5 },
-    // T-Shape (Multiple variations)
+    
     { shape: [[1, 1, 1], [0, 1, 0]], colorClass: 'color-6', points: 5 },
     { shape: [[0, 1, 0], [1, 1, 1]], colorClass: 'color-6', points: 5 },
     { shape: [[1, 0], [1, 1], [1, 0]], colorClass: 'color-6', points: 5 },
     { shape: [[0, 1], [1, 1], [0, 1]], colorClass: 'color-6', points: 5 },
-    // Line (1x4)
+
     { shape: [[1, 1, 1, 1]], colorClass: 'color-7', points: 4 },
-    // Line Vertical (4x1)
+   
     { shape: [[1], [1], [1], [1]], colorClass: 'color-7', points: 4 },
-    // Large Square (3x3)
+    
     { shape: [[1, 1, 1], [1, 1, 1], [1, 1, 1]], colorClass: 'color-1', points: 9 },
-    // Other shapes
-    { shape: [[1, 1, 0], [0, 1, 1]], colorClass: 'color-2', points: 4 }, // S-shape
-    { shape: [[0, 1, 1], [1, 1, 0]], colorClass: 'color-2', points: 4 }, // Z-shape
+   
+    { shape: [[1, 1, 0], [0, 1, 1]], colorClass: 'color-2', points: 4 },
+    { shape: [[0, 1, 1], [1, 1, 0]], colorClass: 'color-2', points: 4 }, 
 ];
 
-// --- Initialization --- 
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM Loaded. Initializing game...");
     initializeGameElements();
@@ -96,15 +96,15 @@ function initializeGameElements() {
     playAgainButtonElement = document.getElementById('play-again-button');
     feedbackTextElement = document.getElementById('feedback-text');
 
-    // Add Event Listeners
+   
     if (restartButtonElement) restartButtonElement.addEventListener('click', startGame);
     if (playAgainButtonElement) playAgainButtonElement.addEventListener('click', startGame);
 
-    // Create particle container
+    
     if (PARTICLES_ENABLED && !document.getElementById('particle-container')) {
         particleContainer = document.createElement('div');
         particleContainer.id = 'particle-container';
-        // Append to the main game container or body
+        
         document.querySelector('.game-container')?.appendChild(particleContainer) || document.body.appendChild(particleContainer);
     }
     console.log("Game elements initialized.");
@@ -115,8 +115,8 @@ function preloadAudios() {
     for (const key in audioFiles) {
         if (key === 'background') {
             backgroundMusic = new Audio(audioFiles[key]);
-            backgroundMusic.loop = true; // Enable looping for background music
-            backgroundMusic.volume = 0.2; // Adjust volume as needed (0.0 to 1.0)
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.2;
             backgroundMusic.preload = 'auto';
             backgroundMusic.onerror = () => {
                 console.warn(`Could not load background music: ${audioFiles[key]}`);
@@ -133,7 +133,7 @@ function preloadAudios() {
     }
 }
 
-// --- Game Core Logic --- 
+
 function startGame() {
     if (!gameBoardElement || !pieceContainerElement) {
         console.error("Cannot start game: Core elements not found.");
@@ -141,12 +141,12 @@ function startGame() {
     }
     console.log("Starting new game...");
 
-    // Stop existing background music if playing
+    
     if (backgroundMusic && !backgroundMusic.paused) {
         backgroundMusic.pause();
-        backgroundMusic.currentTime = 0; // Reset playback position
+        backgroundMusic.currentTime = 0;
     }
-    // Start background music
+    
     if (backgroundMusic) {
         backgroundMusic.play().catch(e => console.warn("Error playing background music:", e));
     }
@@ -157,33 +157,30 @@ function startGame() {
     consecutiveClears = 0;
     board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(0));
 
-    // Reset UI
+  
     gameBoardElement.innerHTML = '';
     pieceContainerElement.innerHTML = '';
     gameOverScreenElement.classList.add('hidden');
     if(feedbackTextElement) feedbackTextElement.className = '';
-    updateScore(0); // Pass 0 to reset display
-    updateComboDisplay(); // Reset combo display
+    updateScore(0); 
+    updateComboDisplay(); 
 
-    // Create Board Cells
+   
     gameBoardElement.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, var(--cell-size))`;
-    cellElementsCache = []; // Clear cache for restart
+    cellElementsCache = [];
     for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             cell.dataset.row = r;
             cell.dataset.col = c;
-            // cell.dataset.cellIndex = r * BOARD_SIZE + c; // Add index if needed later
             addDropListeners(cell);
             gameBoardElement.appendChild(cell);
-            // Store cell element in cache using a 2D-like access or flat array
             if (!cellElementsCache[r]) cellElementsCache[r] = [];
             cellElementsCache[r][c] = cell;
         }
     }
 
-    // Generate Initial Pieces
     currentPieces = [];
     generateNewPieces();
 
@@ -192,7 +189,7 @@ function startGame() {
 
 function getRandomPiece() {
     const randomIndex = Math.floor(Math.random() * PIECES.length);
-    return { ...PIECES[randomIndex] }; // Return a copy
+    return { ...PIECES[randomIndex] };
 }
 
 function generateNewPieces() {
@@ -204,7 +201,7 @@ function generateNewPieces() {
         pieceContainerElement.appendChild(pieceElement);
         currentPieces.push(pieceElement);
     }
-    // Check game over immediately after generating new pieces
+    
     if (checkGameOver()) {
         handleGameOver();
     }
@@ -215,7 +212,6 @@ function createPieceElement(pieceData) {
     const pieceElement = document.createElement('div');
     pieceElement.classList.add('piece');
     pieceElement.draggable = true;
-    // Store data stringified for simplicity
     pieceElement.dataset.piece = JSON.stringify(pieceData);
 
     const shape = pieceData.shape;
@@ -224,8 +220,8 @@ function createPieceElement(pieceData) {
 
     pieceElement.style.gridTemplateRows = `repeat(${rows}, var(--cell-size))`;
     pieceElement.style.gridTemplateColumns = `repeat(${cols}, var(--cell-size))`;
-    pieceElement.style.width = `calc(${cols} * var(--cell-size) + ${cols > 1 ? (cols - 1) * 2 : 0}px)`; // Adjust for gap
-    pieceElement.style.height = `calc(${rows} * var(--cell-size) + ${rows > 1 ? (rows - 1) * 2 : 0}px)`; // Adjust for gap
+    pieceElement.style.width = `calc(${cols} * var(--cell-size) + ${cols > 1 ? (cols - 1) * 2 : 0}px)`; 
+    pieceElement.style.height = `calc(${rows} * var(--cell-size) + ${rows > 1 ? (rows - 1) * 2 : 0}px)`; 
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -248,7 +244,7 @@ function createPieceElement(pieceData) {
     return pieceElement;
 }
 
-// --- Drag and Drop Logic --- 
+// The drag and drop logic is a bit shity 😭, but you can edditit at any time 👌 (allways put me as reference😁) 
 function addDropListeners(cell) {
     cell.addEventListener('dragover', handleDragOver);
     cell.addEventListener('dragenter', handleDragEnter);
@@ -280,7 +276,6 @@ function handleDragStart(event) {
     console.log("Drag start, rel:", relRow, relCol);
 
     event.dataTransfer.effectAllowed = 'move';
-    // Make the original piece semi-transparent using CSS class
     setTimeout(() => pieceElement.classList.add('dragging'), 0);
 }
 
@@ -316,7 +311,7 @@ function handleDrop(event) {
     if (!draggedPiece) return console.error("Drop event fired but no draggedPiece info available.");
 
     const targetCell = event.target.closest('.cell');
-    if (!targetCell) return removeDragOverHighlight(); // Dropped outside valid cell
+    if (!targetCell) return removeDragOverHighlight(); 
 
     const targetRow = parseInt(targetCell.dataset.row);
     const targetCol = parseInt(targetCell.dataset.col);
@@ -325,13 +320,13 @@ function handleDrop(event) {
 
     console.log(`[handleDrop] Dropped on cell (${targetRow}, ${targetCol}). Calculated piece origin: (${startRow}, ${startCol})`);
 
-    // Use the globally stored validity flag (set by addDragOverHighlight)
+ 
     if (window.currentPlacementValid) {
         handleDropLogic(startRow, startCol);
     } else {
         console.log("Drop ignored: Placement was marked as invalid.");
         removeDragOverHighlight();
-        // Reset dragged piece visual state in dragend
+        
     }
 }
 
@@ -345,16 +340,16 @@ function handleDragEnd(event) {
     window.currentPlacementValid = false;
 }
 
-// --- Touch Logic --- 
+
 function addTouchListeners(pieceElement) {
     pieceElement.addEventListener('touchstart', handleTouchStart, { passive: false });
     pieceElement.addEventListener('touchmove', handleTouchMove, { passive: false });
     pieceElement.addEventListener('touchend', handleTouchEnd);
-    pieceElement.addEventListener('touchcancel', handleTouchEnd); // Treat cancel like end
+    pieceElement.addEventListener('touchcancel', handleTouchEnd); 
 }
 
-let touchClone = null; // Clone for visual feedback
-let currentTouchTarget = null; // Cell the touch is currently over
+let touchClone = null; 
+let currentTouchTarget = null;
 
 function handleTouchStart(e) {
     if (isGameOver || e.touches.length !== 1) return;
@@ -369,37 +364,37 @@ function handleTouchStart(e) {
         relRow = parseInt(targetCell.dataset.relRow);
         relCol = parseInt(targetCell.dataset.relCol);
     } else {
-        return; // Touch didn't start on a solid part
+        return; 
     }
     touchStartRelative = { row: relRow, col: relCol };
 
     draggedPiece = {
         element: pieceElement,
         pieceData: JSON.parse(pieceElement.dataset.piece),
-        relativeStart: touchStartRelative // Use same structure for consistency
+        relativeStart: touchStartRelative
     };
 
-    // Create and position clone
+    
     touchClone = pieceElement.cloneNode(true);
     touchClone.style.position = 'absolute';
     touchClone.style.zIndex = '1000';
     touchClone.style.opacity = '0.7';
     touchClone.style.pointerEvents = 'none';
-    touchClone.style.transform = 'scale(1.1)'; // Apply hover effect
+    touchClone.style.transform = 'scale(1.1)';
     document.body.appendChild(touchClone);
 
-    // Calculate offset from top-left of piece element to touch point
+    
     const pieceRect = pieceElement.getBoundingClientRect();
     draggedPiece.touchOffset = {
         x: touch.clientX - pieceRect.left,
         y: touch.clientY - pieceRect.top
     };
 
-    // Initial position based on touch offset
+   
     touchClone.style.left = `${touch.clientX - draggedPiece.touchOffset.x}px`;
     touchClone.style.top = `${touch.clientY - draggedPiece.touchOffset.y}px`;
 
-    pieceElement.classList.add('dragging'); // Dim original
+    pieceElement.classList.add('dragging'); 
     console.log("Touch start, rel:", touchStartRelative.row, touchStartRelative.col);
 }
 
@@ -411,11 +406,11 @@ function handleTouchMove(e) {
     const currentX = touch.clientX;
     const currentY = touch.clientY;
 
-    // Move the clone
+    
     touchClone.style.left = `${currentX - draggedPiece.touchOffset.x}px`;
     touchClone.style.top = `${currentY - draggedPiece.touchOffset.y}px`;
 
-    // Highlighting Logic
+    
     touchClone.style.display = 'none';
     const elementUnderTouch = document.elementFromPoint(currentX, currentY);
     touchClone.style.display = '';
@@ -437,10 +432,10 @@ function handleTouchMove(e) {
 }
 
 function handleTouchEnd(e) {
-    if (!draggedPiece || isGameOver) return; // Ensure draggedPiece exists
+    if (!draggedPiece || isGameOver) return; 
     console.log("Touch end");
 
-    let finalTargetCell = currentTouchTarget; // Use the last known cell from touchmove
+    let finalTargetCell = currentTouchTarget; 
 
     if (finalTargetCell) {
         const targetRow = parseInt(finalTargetCell.dataset.row);
@@ -450,16 +445,16 @@ function handleTouchEnd(e) {
 
         console.log(`[TouchEnd] Target cell (${targetRow}, ${targetCol}). Calculated origin: (${startRow}, ${startCol})`);
 
-        // Rely on validity check from addDragOverHighlight
+       
         if (window.currentPlacementValid) {
              handleDropLogic(startRow, startCol);
         } else {
             console.log("TouchEnd ignored: Placement was marked as invalid.");
             removeDragOverHighlight();
-            draggedPiece.element.classList.remove('dragging'); // Restore original
+            draggedPiece.element.classList.remove('dragging'); 
         }
     } else {
-        // Finger lifted outside a valid drop target
+       
          removeDragOverHighlight();
          if (draggedPiece.element) {
              draggedPiece.element.classList.remove('dragging');
@@ -467,22 +462,20 @@ function handleTouchEnd(e) {
          console.log("Touch ended outside board or on invalid target");
     }
 
-    // Cleanup
+
     if (touchClone && touchClone.parentNode) {
         touchClone.parentNode.removeChild(touchClone);
     }
     touchClone = null;
     currentTouchTarget = null;
     if (draggedPiece && draggedPiece.element) {
-         draggedPiece.element.classList.remove('dragging'); // Ensure removal
+         draggedPiece.element.classList.remove('dragging'); 
     }
     draggedPiece = null;
     window.currentPlacementValid = false;
 }
 
-// --- Placement and Clearing Logic --- 
 
-// Shared logic for drop and touch end
 function handleDropLogic(startRow, startCol) {
     if (!draggedPiece) return console.error("handleDropLogic called without draggedPiece set!");
 
@@ -495,36 +488,36 @@ function handleDropLogic(startRow, startCol) {
         placePiece(pieceData, startRow, startCol);
         updateScore(pieceData.points);
 
-        // Remove the placed piece from the container and state
+       
         pieceElement.remove();
         const pieceIndex = currentPieces.indexOf(pieceElement);
         if (pieceIndex > -1) currentPieces.splice(pieceIndex, 1);
 
-        // Clear completed lines/squares (handles combo increase)
+       
         const clearedCount = clearCompletedLines();
 
-        // Reset combo if piece placed and nothing cleared
+        
         if (clearedCount === 0) {
             resetCombo();
         }
 
-        // Generate new pieces if the container is empty
+        
         if (pieceContainerElement.childElementCount === 0) {
             console.log("Piece container empty, generating new pieces.");
             generateNewPieces();
         } else {
-             // If not empty, still need to check if game over for remaining pieces
+            
              if (checkGameOver()) {
                  handleGameOver();
              }
         }
     } else {
         console.log(`Cannot place piece at (${startRow}, ${startCol}).`);
-        // Piece snaps back visually via dragend/touchend cleanup
+     
         if (pieceElement) pieceElement.classList.remove('dragging');
     }
 
-    // Final cleanup after any drop attempt
+   
     removeDragOverHighlight();
     draggedPiece = null;
     window.currentPlacementValid = false;
@@ -539,7 +532,7 @@ function canPlacePiece(shape, startRow, startCol) {
                 const boardRow = startRow + r;
                 const boardCol = startCol + c;
                 if (boardRow < 0 || boardRow >= BOARD_SIZE || boardCol < 0 || boardCol >= BOARD_SIZE || board[boardRow]?.[boardCol] !== 0) {
-                    // console.log(`[canPlacePiece] FAILED at (${boardRow}, ${boardCol})`); // Verbose log
+                    
                     return false;
                 }
             }
@@ -550,8 +543,8 @@ function canPlacePiece(shape, startRow, startCol) {
 
 function placePiece(pieceData, startRow, startCol) {
     const shape = pieceData.shape;
-    // Find a unique ID (e.g., index + 1) or use color class itself if state only needs visual info
-    const pieceId = PIECES.findIndex(p => p.colorClass === pieceData.colorClass) + 1 || 1; // Example ID
+
+    const pieceId = PIECES.findIndex(p => p.colorClass === pieceData.colorClass) + 1 || 1; 
 
     gameBoardElement.classList.add('board-flash');
     setTimeout(() => gameBoardElement.classList.remove('board-flash'), 100);
@@ -562,7 +555,7 @@ function placePiece(pieceData, startRow, startCol) {
                 const boardRow = startRow + r;
                 const boardCol = startCol + c;
                 if (boardRow < BOARD_SIZE && boardCol < BOARD_SIZE) {
-                    board[boardRow][boardCol] = pieceId; // Update state
+                    board[boardRow][boardCol] = pieceId; 
                     const cellElement = gameBoardElement.querySelector(`.cell[data-row="${boardRow}"][data-col="${boardCol}"]`);
                     if (cellElement) {
                         cellElement.classList.add('occupied', pieceData.colorClass, 'placed');
@@ -574,7 +567,7 @@ function placePiece(pieceData, startRow, startCol) {
         }
     }
     console.log(`Piece placed at (${startRow}, ${startCol})`);
-    // playSound('place');
+    
 }
 
 function clearCompletedLines() {
@@ -582,13 +575,13 @@ function clearCompletedLines() {
     let colsToClear = [];
     let cellsToClearElements = new Set();
 
-    // Check rows
+    
     for (let r = 0; r < BOARD_SIZE; r++) {
         if (board[r].every(cellValue => cellValue !== 0)) {
             rowsToClear.push(r);
         }
     }
-    // Check columns
+    
     for (let c = 0; c < BOARD_SIZE; c++) {
         let colFull = true;
         for (let r = 0; r < BOARD_SIZE; r++) {
@@ -597,7 +590,7 @@ function clearCompletedLines() {
         if (colFull) colsToClear.push(c);
     }
 
-    // Collect unique cells to clear
+  
     rowsToClear.forEach(r => {
         for (let c = 0; c < BOARD_SIZE; c++) {
             cellsToClearElements.add(gameBoardElement.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`));
@@ -612,14 +605,14 @@ function clearCompletedLines() {
     const uniqueLinesCleared = new Set([...rowsToClear, ...colsToClear.map(c => `col-${c}`)]).size;
     const numCellsToClear = cellsToClearElements.size;
 
-    if (numCellsToClear === 0) return 0; // Nothing to clear
+    if (numCellsToClear === 0) return 0; 
 
     console.log(`Cells to clear: ${numCellsToClear}, Lines/Cols Cleared: ${uniqueLinesCleared}`);
     consecutiveClears++;
     comboMultiplier++;
     updateComboDisplay();
 
-    // Animate clearing
+   
     cellsToClearElements.forEach(cellElement => {
         if (cellElement) {
             cellElement.classList.add('clearing');
@@ -628,36 +621,36 @@ function clearCompletedLines() {
         }
     });
 
-    // Play sound and show feedback text
+   
     handleClearFeedback(uniqueLinesCleared);
 
-    // Calculate score
+    
     let pointsPerCell = 10;
     let clearBonus = Math.pow(numCellsToClear, 1.7);
     let comboBonus = comboMultiplier > 1 ? comboMultiplier * 0.75 : 1;
     let pointsForClearing = Math.round((numCellsToClear * pointsPerCell + clearBonus) * comboBonus);
 
-    // Shake board on large clears
+    
     if (numCellsToClear >= BOARD_SIZE) {
         gameBoardElement.classList.add('board-shake');
         setTimeout(() => gameBoardElement.classList.remove('board-shake'), 500);
     }
 
-    // Delay state update
+  
     setTimeout(() => {
-        // Update board state
+        
         cellsToClearElements.forEach(cell => {
              if (cell) board[cell.dataset.row][cell.dataset.col] = 0;
         });
-        // Update DOM
+       
         cellsToClearElements.forEach(cellElement => {
             if (cellElement) cellElement.classList.remove('occupied', 'clearing');
         });
         updateScore(pointsForClearing);
         console.log(`Cleared ${numCellsToClear} cells (${uniqueLinesCleared} lines/cols). Awarded ${pointsForClearing} points.`);
-        // Check game over again after clearing
+        
         if (checkGameOver()) handleGameOver();
-    }, 400); // Animation duration
+    }, 400);
 
     return numCellsToClear;
 }
@@ -666,7 +659,7 @@ function handleClearFeedback(linesCleared) {
     let feedbackText = "";
     let soundToPlay = null;
     let isUnbelievable = false;
-    let pitchMultiplier = 1.0; // Default pitch
+    let pitchMultiplier = 1.0; 
 
     switch (linesCleared) {
         case 1: 
@@ -689,19 +682,19 @@ function handleClearFeedback(linesCleared) {
             soundToPlay = 'excellent'; 
             pitchMultiplier = 1.3;
             break;
-        default: // 5 or more
-             if (linesCleared > 0) { // Only show for actual clears >= 5
+        default: 
+             if (linesCleared > 0) { 
                  feedbackText = "Unbelievable!";
                  soundToPlay = 'unbelievable';
                  isUnbelievable = true;
-                 pitchMultiplier = 1.4 + (linesCleared - 5) * 0.05; // Increase pitch slightly for > 5 clears
+                 pitchMultiplier = 1.4 + (linesCleared - 5) * 0.05; 
              }
             break;
     }
 
     if (soundToPlay) playSound(soundToPlay);
     
-    // Play the pitched sound if lines were cleared
+    
     if (linesCleared > 0 && sounds['chiu']) {
         sounds['chiu'].playbackRate = pitchMultiplier;
         playSound('chiu');
@@ -726,14 +719,11 @@ function handleClearFeedback(linesCleared) {
 
 function checkGameOver() {
     if (currentPieces.length === 0 && pieceContainerElement.childElementCount > 0) {
-         // Pieces are visually present but not in state array - likely error, treat as game over?
          console.warn("Piece elements exist but currentPieces array is empty. Potential state mismatch.");
-         // Let's try regenerating state from DOM as a fallback, though this indicates a bug
          currentPieces = Array.from(pieceContainerElement.querySelectorAll('.piece'));
-         if (currentPieces.length === 0) return true; // If still no pieces, definitely game over
+         if (currentPieces.length === 0) return true; 
     }
-    if (currentPieces.length === 0) return false; // No pieces, not game over yet (should generate)
-
+    if (currentPieces.length === 0) return false; 
     for (const pieceElement of currentPieces) {
         if (!pieceElement || !pieceElement.dataset || !pieceElement.dataset.piece) continue;
         try {
@@ -742,14 +732,14 @@ function checkGameOver() {
             for (let r = 0; r <= BOARD_SIZE - shape.length; r++) {
                 for (let c = 0; c <= BOARD_SIZE - shape[0].length; c++) {
                     if (canPlacePiece(shape, r, c)) {
-                        // console.log(`CheckGameOver: Piece can fit at (${r}, ${c})`);
-                        return false; // Found a placement
+                       
+                        return false; 
                     }
                 }
             }
         } catch (e) {
             console.error("Error parsing piece data during game over check:", e, pieceElement.dataset.piece);
-            continue; // Skip this piece if data is corrupt
+            continue; 
         }
     }
     console.log("CheckGameOver: No available piece can be placed.");
@@ -757,29 +747,29 @@ function checkGameOver() {
 }
 
 function handleGameOver() {
-    if (isGameOver) return; // Prevent multiple calls
+    if (isGameOver) return; 
     isGameOver = true;
     finalScoreElement.textContent = score;
     gameOverScreenElement.classList.remove('hidden');
     console.log("GAME OVER! Final Score:", score);
 
-    // Game Over Effects
+    
     if (PARTICLES_ENABLED) {
-        // Explosion effect
+        
         const boardRect = gameBoardElement.getBoundingClientRect();
         const containerRect = particleContainer.getBoundingClientRect();
         const centerX = boardRect.left - containerRect.left + boardRect.width / 2;
         const centerY = boardRect.top - containerRect.top + boardRect.height / 2;
-        for (let i = 0; i < 50; i++) { // More particles for game over
+        for (let i = 0; i < 50; i++) { 
              const colors = ['#ff595e', '#ffd166', '#54c059', '#2d8fff', '#bf83fb', '#ff924c', '#5fc9f8'];
-             createParticle(centerX, centerY, colors[i % colors.length], 2); // Faster
+             createParticle(centerX, centerY, colors[i % colors.length], 2); 
         }
     }
-    pieceContainerElement.innerHTML = ''; // Clear remaining pieces visually
-    playSound('gameover'); // Play the game over sound
+    pieceContainerElement.innerHTML = ''; 
+    playSound('gameover'); 
 }
 
-// --- Utility and UI Functions --- 
+
 
 function playSound(soundName) {
     if (sounds[soundName]) {
@@ -795,12 +785,12 @@ function updateScore(pointsToAdd) {
     scoreElement.textContent = score;
 
     if (pointsToAdd > 0) {
-        // Score animation
+        
         scoreElement.classList.remove('updated');
         void scoreElement.offsetWidth;
         scoreElement.classList.add('updated');
         setTimeout(() => scoreElement.classList.remove('updated'), 200);
-        // Floating points
+       
         createFloatingPoints(pointsToAdd);
     }
     console.log("Score updated:", score);
@@ -810,11 +800,10 @@ function createFloatingPoints(points) {
      const floatingPoints = document.createElement('div');
      floatingPoints.className = 'floating-points';
      floatingPoints.textContent = `+${points}`;
-     // Positioning relative to the score element within the header
      const scoreRect = scoreElement.getBoundingClientRect();
-     const headerRect = scoreElement.closest('.game-header').getBoundingClientRect(); // Find header
-     floatingPoints.style.left = `${scoreRect.right - headerRect.left + 10}px`; // Relative to header left
-     floatingPoints.style.top = `${scoreRect.top - headerRect.top}px`;      // Relative to header top
+     const headerRect = scoreElement.closest('.game-header').getBoundingClientRect(); 
+     floatingPoints.style.left = `${scoreRect.right - headerRect.left + 10}px`; 
+     floatingPoints.style.top = `${scoreRect.top - headerRect.top}px`;   
      floatingPoints.style.animation = 'float-up 1.2s ease-out forwards';
      scoreElement.closest('.game-header').appendChild(floatingPoints);
      setTimeout(() => floatingPoints.remove(), 1200);
@@ -831,8 +820,6 @@ function updateComboDisplay() {
         comboDisplayElement.classList.toggle('mega-combo', comboMultiplier >= 4);
     } else {
         comboDisplayElement.classList.remove('visible', 'mega-combo');
-        // Clear text after fade out for cleaner state
-        // setTimeout(() => { if(comboMultiplier <= 1) comboDisplayElement.textContent = ''; }, 300);
     }
 }
 
@@ -845,7 +832,7 @@ function resetCombo() {
     }
 }
 
-// --- Particle Functions --- 
+
 
 function createPlacementParticles(cellElement, colorClass) {
     if (!particleContainer) return;
@@ -898,23 +885,23 @@ function createParticle(x, y, color, speedMultiplier = 1) {
     particle.style.animation = `particle-fade ${0.5 + Math.random() * 0.5}s forwards`;
 
     particleContainer.appendChild(particle);
-    //setTimeout(() => particle.remove(), 1000); // Temporarily comment out to check if it causes the syntax error
+   
 }
 
-// Highlight function for drag over
+
 function addDragOverHighlight(targetCellElement) {
     if (!draggedPiece) return;
-    removeDragOverHighlight(); // Clear previous
+    removeDragOverHighlight(); 
 
     const targetRow = parseInt(targetCellElement.dataset.row);
     const targetCol = parseInt(targetCellElement.dataset.col);
     const shape = draggedPiece.pieceData.shape;
-    // Use relativeStart from draggedPiece (set in dragstart/touchstart)
+   
     const startRow = targetRow - draggedPiece.relativeStart.row;
     const startCol = targetCol - draggedPiece.relativeStart.col;
 
     let canPlace = true;
-    highlightedCells = []; // Reset list
+    highlightedCells = []; 
 
     for (let r = 0; r < shape.length; r++) {
         for (let c = 0; c < shape[r].length; c++) {
@@ -922,16 +909,16 @@ function addDragOverHighlight(targetCellElement) {
                 const boardRow = startRow + r;
                 const boardCol = startCol + c;
 
-                // Use cache instead of querySelector
+                
                 const currentCell = (boardRow >= 0 && boardRow < BOARD_SIZE && boardCol >= 0 && boardCol < BOARD_SIZE)
-                                    ? cellElementsCache[boardRow]?.[boardCol] // Access cache
+                                    ? cellElementsCache[boardRow]?.[boardCol] 
                                     : null;
 
-                // const currentCell = gameBoardElement.querySelector(`.cell[data-row="${boardRow}"][data-col="${boardCol}"]`); // Old way
+    
 
                 if (!currentCell || board[boardRow]?.[boardCol] !== 0) {
                     canPlace = false;
-                    // Still highlight invalid cells if they exist on the board
+                    
                     if (currentCell) {
                         currentCell.classList.add('invalid-placement');
                         highlightedCells.push(currentCell);
@@ -943,8 +930,8 @@ function addDragOverHighlight(targetCellElement) {
             }
         }
     }
-    window.currentPlacementValid = canPlace; // Update validity flag
-    // console.log("Highlight check - canPlace:", canPlace); // Reduced verbosity
+    window.currentPlacementValid = canPlace; 
+    
 }
 
 function removeDragOverHighlight() {
