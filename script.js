@@ -209,23 +209,55 @@ function checkLineCompletionOnBoard(boardToCheck, boardSize) {
     return false; 
 }
 
+function calculateFitScore(shape, r_start, c_start, currentBoard, boardSize) {
+    let touchingSides = 0;
+    const pieceHeight = shape.length;
+    const pieceWidth = shape[0].length;
+
+    for (let r_piece = 0; r_piece < pieceHeight; r_piece++) {
+        for (let c_piece = 0; c_piece < pieceWidth; c_piece++) {
+            if (shape[r_piece][c_piece] === 1) {
+                const board_r = r_start + r_piece;
+                const board_c = c_start + c_piece;
+
+                
+                if (board_r === 0 || (board_r > 0 && currentBoard[board_r - 1][board_c] !== 0)) {
+                    touchingSides++;
+                }
+                
+                if (board_r === boardSize - 1 || (board_r < boardSize - 1 && currentBoard[board_r + 1][board_c] !== 0)) {
+                    touchingSides++;
+                }
+                
+                if (board_c === 0 || (board_c > 0 && currentBoard[board_r][board_c - 1] !== 0)) {
+                    touchingSides++;
+                }
+                
+                if (board_c === boardSize - 1 || (board_c < boardSize - 1 && currentBoard[board_r][board_c + 1] !== 0)) {
+                    touchingSides++;
+                }
+            }
+        }
+    }
+    return touchingSides;
+}
+
 
 function getRandomPiece() {
     const ADAPTIVE_CHANCE = 0.6; 
     const DENSE_THRESHOLD = 0.60; 
+    const MIN_GOOD_FIT_SCORE = 5;
+    let chosenPieceData = null; 
 
     if (Math.random() < ADAPTIVE_CHANCE) {
         
         const lineCompletionCandidates = [];
-        
         for (const pieceProto of PIECES) {
             let pieceAdded = false; 
             for (let r_start = 0; r_start <= BOARD_SIZE - pieceProto.shape.length; r_start++) {
                 for (let c_start = 0; c_start <= BOARD_SIZE - pieceProto.shape[0].length; c_start++) {
                     if (canPlacePiece(pieceProto.shape, r_start, c_start)) {
                         const tempBoard = board.map(row => [...row]); 
-
-                        
                         for (let r_piece = 0; r_piece < pieceProto.shape.length; r_piece++) {
                             for (let c_piece = 0; c_piece < pieceProto.shape[0].length; c_piece++) {
                                 if (pieceProto.shape[r_piece][c_piece] === 1) {
@@ -233,8 +265,6 @@ function getRandomPiece() {
                                 }
                             }
                         }
-
-                        
                         if (checkLineCompletionOnBoard(tempBoard, BOARD_SIZE)) {
                             lineCompletionCandidates.push(pieceProto);
                             pieceAdded = true; 
@@ -248,50 +278,67 @@ function getRandomPiece() {
 
         if (lineCompletionCandidates.length > 0) {
             console.log("Adaptive piece: Line completion candidate found");
-            return { ...lineCompletionCandidates[Math.floor(Math.random() * lineCompletionCandidates.length)] };
+            chosenPieceData = { ...lineCompletionCandidates[Math.floor(Math.random() * lineCompletionCandidates.length)] };
         }
 
         
-        
-        let occupiedCells = 0;
-        for (let r = 0; r < BOARD_SIZE; r++) {
-            for (let c = 0; c < BOARD_SIZE; c++) {
-                if (board[r][c] !== 0) {
-                    occupiedCells++;
-                }
-            }
-        }
-        const density = occupiedCells / (BOARD_SIZE * BOARD_SIZE);
+        if (!chosenPieceData) { 
+            let bestFitCandidate = null;
+            let maxFitScore = -1;
 
-        
-        if (density > DENSE_THRESHOLD) {
-            
-            const smallPieces = PIECES.filter(p => p.points <= 3);
-            
-            
-            const placeableSmallPieces = smallPieces.filter(p => {
-                for (let r_check = 0; r_check <= BOARD_SIZE - p.shape.length; r_check++) {
-                    for (let c_check = 0; c_check <= BOARD_SIZE - p.shape[0].length; c_check++) {
-                        if (canPlacePiece(p.shape, r_check, c_check)) {
-                            return true; 
+            for (const pieceProto of PIECES) {
+                for (let r_place = 0; r_place <= BOARD_SIZE - pieceProto.shape.length; r_place++) {
+                    for (let c_place = 0; c_place <= BOARD_SIZE - pieceProto.shape[0].length; c_place++) {
+                        if (canPlacePiece(pieceProto.shape, r_place, c_place)) {
+                            const currentFitScore = calculateFitScore(pieceProto.shape, r_place, c_place, board, BOARD_SIZE);
+                            if (currentFitScore > maxFitScore) {
+                                maxFitScore = currentFitScore;
+                                bestFitCandidate = pieceProto;
+                            }
                         }
                     }
                 }
-                return false; 
-            });
+            }
 
-            if (placeableSmallPieces.length > 0) {
-                console.log("Adaptive piece: Small piece due to high density");
-                
-                return { ...placeableSmallPieces[Math.floor(Math.random() * placeableSmallPieces.length)] };
+            if (bestFitCandidate && maxFitScore >= MIN_GOOD_FIT_SCORE) {
+                console.log("Adaptive piece: Best Fit candidate found with score:", maxFitScore);
+                chosenPieceData = { ...bestFitCandidate };
             }
         }
         
-        
-        
+        if (!chosenPieceData) { 
+            let occupiedCells = 0;
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (board[r][c] !== 0) {
+                        occupiedCells++;
+                    }
+                }
+            }
+            const density = occupiedCells / (BOARD_SIZE * BOARD_SIZE);
+
+            if (density > DENSE_THRESHOLD) {
+                const smallPieces = PIECES.filter(p => p.points <= 3);
+                const placeableSmallPieces = smallPieces.filter(p => {
+                    for (let r_check = 0; r_check <= BOARD_SIZE - p.shape.length; r_check++) {
+                        for (let c_check = 0; c_check <= BOARD_SIZE - p.shape[0].length; c_check++) {
+                            if (canPlacePiece(p.shape, r_check, c_check)) return true;
+                        }
+                    }
+                    return false;
+                });
+                if (placeableSmallPieces.length > 0) {
+                    console.log("Adaptive piece: Small piece due to high density");
+                    chosenPieceData = { ...placeableSmallPieces[Math.floor(Math.random() * placeableSmallPieces.length)] };
+                }
+            }
+        }
     }
 
     
+    if (chosenPieceData) {
+        return chosenPieceData;
+    }
     
     return getTrulyRandomPiece();
 }
@@ -1129,5 +1176,7 @@ function removeDragOverHighlight() {
     highlightedCells = [];
     window.currentPlacementValid = false;
 }
+
+[end of script.js]
 
 [end of script.js]
