@@ -1,4 +1,3 @@
-
 const BOARD_SIZE = 9;
 const PIECE_AREA_COUNT = 3;
 const PARTICLES_ENABLED = true;
@@ -56,15 +55,15 @@ const PIECES = [
    
     { shape: [[1, 1], [1, 1]], colorClass: 'color-4', points: 4 },
 
-    { shape: [[1, 0], [1, 0], [1, 1]], colorClass: 'color-5', points: 5 },
-    { shape: [[0, 1], [0, 1], [1, 1]], colorClass: 'color-5', points: 5 },
-    { shape: [[1, 1, 1], [1, 0, 0]], colorClass: 'color-5', points: 5 },
-    { shape: [[1, 1, 1], [0, 0, 1]], colorClass: 'color-5', points: 5 },
+    { shape: [[1, 0], [1, 0], [1, 1]], colorClass: 'color-5', points: 4 },
+    { shape: [[0, 1], [0, 1], [1, 1]], colorClass: 'color-5', points: 4 },
+    { shape: [[1, 1, 1], [1, 0, 0]], colorClass: 'color-5', points: 4 },
+    { shape: [[1, 1, 1], [0, 0, 1]], colorClass: 'color-5', points: 4 },
     
-    { shape: [[1, 1, 1], [0, 1, 0]], colorClass: 'color-6', points: 5 },
-    { shape: [[0, 1, 0], [1, 1, 1]], colorClass: 'color-6', points: 5 },
-    { shape: [[1, 0], [1, 1], [1, 0]], colorClass: 'color-6', points: 5 },
-    { shape: [[0, 1], [1, 1], [0, 1]], colorClass: 'color-6', points: 5 },
+    { shape: [[1, 1, 1], [0, 1, 0]], colorClass: 'color-6', points: 4 },
+    { shape: [[0, 1, 0], [1, 1, 1]], colorClass: 'color-6', points: 4 },
+    { shape: [[1, 0], [1, 1], [1, 0]], colorClass: 'color-6', points: 4 },
+    { shape: [[0, 1], [1, 1], [0, 1]], colorClass: 'color-6', points: 4 },
 
     { shape: [[1, 1, 1, 1]], colorClass: 'color-7', points: 4 },
    
@@ -617,7 +616,7 @@ function clearCompletedLines() {
         if (cellElement) {
             cellElement.classList.add('clearing');
             PIECES.forEach(p => cellElement.classList.remove(p.colorClass));
-            if (PARTICLES_ENABLED) createClearingParticles(cellElement);
+            if (PARTICLES_ENABLED) createClearingParticles(cellElement, uniqueLinesCleared);
         }
     });
 
@@ -749,6 +748,30 @@ function checkGameOver() {
 function handleGameOver() {
     if (isGameOver) return; 
     isGameOver = true;
+
+    const messages = [
+        "¡Buen Intento!", 
+        "¡Sigue Practicando!", 
+        "¡Casi lo Logras!", 
+        "¡Nada Mal!", 
+        "¡Puedes Mejorar!",
+        "¡Esa estuvo cerca!",
+        "¡A Seguir Jugando!"
+    ];
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    const messageElement = document.getElementById('game-over-message');
+    if (messageElement) {
+        messageElement.textContent = randomMessage;
+        // Reset animation properties if re-showing screen without page reload (not strictly necessary with current startGame logic)
+        messageElement.style.opacity = '0'; // Ensure it starts transparent for animation
+        // Force reflow to ensure animation restarts if it were to be played multiple times without full screen hide/show
+        void messageElement.offsetWidth; 
+        messageElement.style.animation = ''; // Clear previous animation
+        requestAnimationFrame(() => { // Re-apply animation
+             messageElement.style.animation = 'gameOverSlideIn 0.6s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+        });
+    }
+
     finalScoreElement.textContent = score;
     gameOverScreenElement.classList.remove('hidden');
     console.log("GAME OVER! Final Score:", score);
@@ -848,15 +871,16 @@ function createPlacementParticles(cellElement, colorClass) {
     }
 }
 
-function createClearingParticles(cellElement) {
+function createClearingParticles(cellElement, uniqueLinesCleared = 1) {
     if (!particleContainer) return;
     const rect = cellElement.getBoundingClientRect();
     const containerRect = particleContainer.getBoundingClientRect();
     const centerX = rect.left - containerRect.left + rect.width / 2;
     const centerY = rect.top - containerRect.top + rect.height / 2;
     const particleColors = ['#ffff00', '#ffffff', '#ffff88'];
-    const particleCount = 8 + Math.floor(Math.random() * 8);
-    for (let i = 0; i < particleCount; i++) {
+    const baseParticleCount = 5 + Math.floor(Math.random() * 5);
+    const finalParticleCount = Math.min(baseParticleCount * uniqueLinesCleared, 40); // Max 40 particles per cell
+    for (let i = 0; i < finalParticleCount; i++) {
         const color = particleColors[Math.floor(Math.random() * particleColors.length)];
         createParticle(centerX, centerY, color, 1.2);
     }
@@ -940,4 +964,4 @@ function removeDragOverHighlight() {
     });
     highlightedCells = [];
     window.currentPlacementValid = false;
-} 
+}

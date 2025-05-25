@@ -156,7 +156,7 @@ html, body {
 }
 
 .restart-button {
-    background: linear-gradient(145deg, #5a5aa0, #464680);
+    background: var(--color-4);
     border: none;
     color: var(--text-color);
     padding: 10px 12px;
@@ -169,12 +169,13 @@ html, body {
 }
 
 .restart-button:hover {
-    background: linear-gradient(145deg, #6a6ab0, #5a5a90);
+    background: #50a8ff;
     transform: translateY(-2px);
     box-shadow: 0 6px 10px rgba(0,0,0,0.3);
 }
 
 .restart-button:active {
+    background: #1e78d9;
     transform: scale(0.95) translateY(0);
     box-shadow: 0 2px 3px rgba(0,0,0,0.2);
 }
@@ -382,7 +383,7 @@ html, body {
 
 
 .piece.dragging {
-    opacity: 0.4 !important;
+    opacity: 0.65 !important;
     transform: scale(1.1);
     animation: none;
     z-index: 1000;
@@ -390,11 +391,11 @@ html, body {
 
 
 .cell.drag-over {
-    background-color: rgba(255, 255, 255, 0.25) !important;
+    background-color: rgba(255, 255, 255, 0.35) !important;
     transform: scale(1.05);
     box-shadow: 
-        inset 0 0 5px rgba(255, 255, 255, 0.5),
-        0 0 8px rgba(100, 200, 255, 0.5);
+        inset 0 0 6px rgba(255, 255, 255, 0.6),
+        0 0 10px rgba(120, 210, 255, 0.6);
     z-index: 5;
 }
 
@@ -407,28 +408,28 @@ html, body {
 
 @keyframes clear-line {
     0% { 
-        transform: scale(1); 
-        opacity: 1; 
-        background-color: rgba(255, 255, 120, 0.9); 
-        border-radius: var(--cell-border-radius);
-        box-shadow: 0 0 20px rgba(255, 255, 100, 0.8), inset 0 0 10px rgba(255, 255, 100, 0.5);
-    }
-    30% { 
         transform: scale(1.1); 
-        opacity: 0.9; 
-        background-color: rgba(255, 255, 200, 1);
+        opacity: 1; 
+        background-color: rgba(220, 220, 255, 1); 
+        box-shadow: 0 0 25px rgba(200, 200, 255, 1), inset 0 0 15px rgba(255, 255, 255, 0.8);
+        border-radius: var(--cell-border-radius);
+    }
+    60% { 
+        transform: scale(1.25); 
+        opacity: 0.5; 
+        background-color: rgba(255, 255, 255, 0.7);
     }
     100% { 
-        transform: scale(0.1); 
+        transform: scale(0); 
         opacity: 0; 
         background-color: var(--empty-cell-bg); 
         border-radius: 50%; 
-        box-shadow: 0 0 40px rgba(255, 255, 100, 0);
+        box-shadow: none;
     }
 }
 
 .cell.clearing {
-    animation: clear-line 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: clear-line 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
     background-color: var(--empty-cell-bg) !important;
     box-shadow: none !important;
     z-index: 10;
@@ -468,6 +469,16 @@ html, body {
     transform: translateY(-20px);
     opacity: 0;
     animation: gameOverSlideIn 0.6s 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.game-over-message {
+    font-size: 1.6em; /* Slightly smaller than score */
+    color: #f0f0f0; /* Light color */
+    margin-bottom: 20px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transform: translateY(-20px); /* Initial position for animation */
+    opacity: 0; /* Initial state for animation */
+    animation: gameOverSlideIn 0.6s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Staggered animation */
 }
 
 .game-over-screen p {
@@ -738,4 +749,4 @@ html, body {
 
 @media (max-width: 600px) {
 
-} 
+}
