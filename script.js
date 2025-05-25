@@ -185,15 +185,13 @@ function startGame() {
     console.log("Game started. Board and pieces initialized.");
 }
 
-// Helper function to check for any completed lines on a given board state
 function checkLineCompletionOnBoard(boardToCheck, boardSize) {
-    // Check rows
     for (let r = 0; r < boardSize; r++) {
         if (boardToCheck[r].every(cellValue => cellValue !== 0)) {
-            return true; // Found a completed row
+            return true; 
         }
     }
-    // Check columns
+    
     for (let c = 0; c < boardSize; c++) {
         let colFull = true;
         for (let r = 0; r < boardSize; r++) {
@@ -203,46 +201,42 @@ function checkLineCompletionOnBoard(boardToCheck, boardSize) {
             }
         }
         if (colFull) {
-            return true; // Found a completed column
+            return true; 
         }
     }
-    return false; // No completed lines
+    return false; 
 }
 
-// New function for adaptive piece generation
 function getRandomPiece() {
-    const ADAPTIVE_CHANCE = 0.6; // 60% chance to try adaptive logic
+    const ADAPTIVE_CHANCE = 0.6; 
     const DENSE_THRESHOLD = 0.60; 
 
     if (Math.random() < ADAPTIVE_CHANCE) {
-        // --- Line Completion Attempt ---
         const lineCompletionCandidates = [];
-        // Iterate through each piece prototype in PIECES
         for (const pieceProto of PIECES) {
-            let pieceAdded = false; // Flag to stop checking other placements for this pieceProto
+            let pieceAdded = false; 
             for (let r_start = 0; r_start <= BOARD_SIZE - pieceProto.shape.length; r_start++) {
                 for (let c_start = 0; c_start <= BOARD_SIZE - pieceProto.shape[0].length; c_start++) {
                     if (canPlacePiece(pieceProto.shape, r_start, c_start)) {
-                        const tempBoard = board.map(row => [...row]); // Create a deep copy of the current board
+                        const tempBoard = board.map(row => [...row]); 
 
-                        // Simulate placing the piece on the tempBoard
                         for (let r_piece = 0; r_piece < pieceProto.shape.length; r_piece++) {
                             for (let c_piece = 0; c_piece < pieceProto.shape[0].length; c_piece++) {
                                 if (pieceProto.shape[r_piece][c_piece] === 1) {
-                                    tempBoard[r_start + r_piece][c_start + c_piece] = 1; // Mark as occupied
+                                    tempBoard[r_start + r_piece][c_start + c_piece] = 1; 
                                 }
                             }
                         }
 
-                        // Check if this placement completes any line on the tempBoard
+                        
                         if (checkLineCompletionOnBoard(tempBoard, BOARD_SIZE)) {
                             lineCompletionCandidates.push(pieceProto);
-                            pieceAdded = true; // Mark that this piece can complete a line
-                            break; // Break from c_start loop
+                            pieceAdded = true; 
+                            break; 
                         }
                     }
                 }
-                if (pieceAdded) break; // Break from r_start loop if piece was added
+                if (pieceAdded) break; 
             }
         }
 
@@ -251,8 +245,7 @@ function getRandomPiece() {
             return { ...lineCompletionCandidates[Math.floor(Math.random() * lineCompletionCandidates.length)] };
         }
 
-        // --- Density Check Logic (if no line completion piece was found/returned) ---
-        // (Existing density check code from the previous step follows here)
+        
         let occupiedCells = 0;
         for (let r = 0; r < BOARD_SIZE; r++) {
             for (let c = 0; c < BOARD_SIZE; c++) {
@@ -263,41 +256,31 @@ function getRandomPiece() {
         }
         const density = occupiedCells / (BOARD_SIZE * BOARD_SIZE);
 
-        // If board is considered dense, try to offer smaller, more placeable pieces
         if (density > DENSE_THRESHOLD) {
-            // Filter for small pieces (e.g., 1, 2, or 3 blocks - points are a proxy for size)
             const smallPieces = PIECES.filter(p => p.points <= 3);
             
-            // Filter further for small pieces that can actually be placed on the current board
             const placeableSmallPieces = smallPieces.filter(p => {
                 for (let r_check = 0; r_check <= BOARD_SIZE - p.shape.length; r_check++) {
                     for (let c_check = 0; c_check <= BOARD_SIZE - p.shape[0].length; c_check++) {
                         if (canPlacePiece(p.shape, r_check, c_check)) {
-                            return true; // Found a spot for this small piece
+                            return true; 
                         }
                     }
                 }
-                return false; // No spot found for this small piece
+                return false; 
             });
 
             if (placeableSmallPieces.length > 0) {
                 console.log("Adaptive piece: Small piece due to high density");
-                // Return a random one from the placeable small pieces
+           
                 return { ...placeableSmallPieces[Math.floor(Math.random() * placeableSmallPieces.length)] };
             }
         }
-        // --- End of Density Check Logic ---
-
-        // (Future placeholder for line completion logic)
-        // console.log("Adaptive piece: Attempting line completion (not yet implemented)");
     }
 
-    // Fallback to truly random piece if adaptive logic isn't triggered or doesn't find a suitable piece
-    // console.log("Adaptive piece: Falling back to truly random");
     return getTrulyRandomPiece();
 }
 
-// Original random piece generation, now renamed.
 function getTrulyRandomPiece() {
     const randomIndex = Math.floor(Math.random() * PIECES.length);
     return { ...PIECES[randomIndex] };
@@ -363,17 +346,12 @@ function addDropListeners(cell) {
 }
 
 function addDragListeners(pieceElement) {
-    // Sets up event listeners for when a piece drag starts and ends.
     pieceElement.addEventListener('dragstart', handleDragStart);
     pieceElement.addEventListener('dragend', handleDragEnd);
 }
 
-// Handles the start of a piece drag operation.
 function handleDragStart(event) {
-    // Prevent dragging if the game is over.
     if (isGameOver) return event.preventDefault();
-
-    // Determine the sub-cell of the piece that was initially clicked/dragged.
     const targetCell = event.target.closest('.piece-cell');
     let relRow = 0, relCol = 0;
     if (targetCell && !targetCell.classList.contains('empty')) {
@@ -381,41 +359,32 @@ function handleDragStart(event) {
         relCol = parseInt(targetCell.dataset.relCol);
     }
 
-    // Store information about the dragged piece.
     const pieceElement = event.currentTarget;
     draggedPiece = {
         element: pieceElement,
         pieceData: JSON.parse(pieceElement.dataset.piece),
-        relativeStart: { row: relRow, col: relCol } // Relative position of the drag start within the piece.
+        relativeStart: { row: relRow, col: relCol } 
     };
     console.log("Drag start, rel:", relRow, relCol);
-
-    // Set data transfer properties and style for dragging.
     event.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => pieceElement.classList.add('dragging'), 0); // Add dragging class with a timeout to ensure it applies after drag starts.
-}
+    setTimeout(() => pieceElement.classList.add('dragging'), 0); 
 
-// Handles when a dragged piece is over a potential drop target.
 function handleDragOver(event) {
-    event.preventDefault(); // Allow drop.
-    event.dataTransfer.dropEffect = 'move'; // Visual feedback to the user.
+    event.preventDefault(); 
+    event.dataTransfer.dropEffect = 'move'; 
 }
 
-// Handles when a dragged piece enters a potential drop target cell.
 function handleDragEnter(event) {
     event.preventDefault();
     const targetCell = event.target.closest('.cell');
-    // Highlight the cells if the target is a valid, unoccupied cell and a piece is being dragged.
     if (targetCell && !targetCell.classList.contains('occupied') && draggedPiece) {
         console.log('[handleDragEnter] Entered cell:', targetCell.dataset.row, targetCell.dataset.col);
         addDragOverHighlight(targetCell);
     }
 }
 
-// Handles when a dragged piece leaves a potential drop target cell.
 function handleDragLeave(event) {
     const relatedTarget = event.relatedTarget ? event.relatedTarget.closest('.cell') : null;
-    // Remove highlight if leaving the current cell or the entire board.
     if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
         const isLeavingHighlightedArea = highlightedCells.length > 0 && !highlightedCells.some(cell => cell === relatedTarget);
         if (isLeavingHighlightedArea || !relatedTarget) {
@@ -425,7 +394,6 @@ function handleDragLeave(event) {
     }
 }
 
-// Handles the drop of a piece onto the board.
 function handleDrop(event) {
     console.log('[handleDrop] Drop event fired on cell:', event.target);
     event.preventDefault();
@@ -433,9 +401,7 @@ function handleDrop(event) {
     if (!draggedPiece) return console.error("Drop event fired but no draggedPiece info available.");
 
     const targetCell = event.target.closest('.cell');
-    if (!targetCell) return removeDragOverHighlight(); // If not dropped on a valid cell, remove highlight.
-
-    // Calculate the top-left (origin) position of the piece on the board.
+    if (!targetCell) return removeDragOverHighlight(); 
     const targetRow = parseInt(targetCell.dataset.row);
     const targetCol = parseInt(targetCell.dataset.col);
     const startRow = targetRow - draggedPiece.relativeStart.row;
@@ -443,30 +409,26 @@ function handleDrop(event) {
 
     console.log(`[handleDrop] Dropped on cell (${targetRow}, ${targetCol}). Calculated piece origin: (${startRow}, ${startCol})`);
 
-    // If the placement is valid, proceed with the drop logic.
     if (window.currentPlacementValid) {
         handleDropLogic(startRow, startCol);
     } else {
-        // If placement is invalid, log and remove highlight.
         console.log("Drop ignored: Placement was marked as invalid.");
         removeDragOverHighlight();
         
     }
 }
 
-// Handles the end of a drag operation (whether successful or not).
 function handleDragEnd(event) {
     console.log("Drag end");
-    // Clean up: remove dragging class, clear highlights, and reset draggedPiece info.
     if (draggedPiece && draggedPiece.element) {
         draggedPiece.element.classList.remove('dragging');
     }
     removeDragOverHighlight();
     draggedPiece = null;
-    window.currentPlacementValid = false; // Reset placement validity flag.
+    window.currentPlacementValid = false;
 }
 
-// Sets up touch event listeners for a piece element.
+
 function addTouchListeners(pieceElement) {
     pieceElement.addEventListener('touchstart', handleTouchStart, { passive: false });
     pieceElement.addEventListener('touchmove', handleTouchMove, { passive: false });
