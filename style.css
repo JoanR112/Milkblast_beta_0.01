@@ -472,13 +472,13 @@ html, body {
 }
 
 .game-over-message {
-    font-size: 1.6em; /* Slightly smaller than score */
-    color: #f0f0f0; /* Light color */
+    font-size: 1.6em; 
+    color: #f0f0f0; 
     margin-bottom: 20px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    transform: translateY(-20px); /* Initial position for animation */
-    opacity: 0; /* Initial state for animation */
-    animation: gameOverSlideIn 0.6s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Staggered animation */
+    transform: translateY(-20px); 
+    opacity: 0; 
+    animation: gameOverSlideIn 0.6s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
 }
 
 .game-over-screen p {
@@ -750,3 +750,5 @@ html, body {
 @media (max-width: 600px) {
 
 }
+
+[end of style.css]
